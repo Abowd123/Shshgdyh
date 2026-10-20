@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+<meta name="theme-color" content="#0d1117">
+<link rel="icon" href="icon.png">
+<title>ZIP إلى GitHub</title>
+<style>
+:root{--bg:#0d1117;--card:#161b22;--line:#30363d;--tx:#e6edf3;--mut:#8b949e;--ac:#238636;--ac2:#2ea043;--er:#f85149;--bl:#58a6ff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{overscroll-behavior:none}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--tx);font:15px/1.6 system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;display:flex;justify-content:center;
+ padding:calc(18px + env(safe-area-inset-top)) 14px calc(18px + env(safe-area-inset-bottom))}
+.card{width:100%;max-width:560px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;align-self:flex-start}
+h1{font-size:20px;margin:0 0 4px;display:flex;gap:10px;align-items:center}
+.sub{color:var(--mut);font-size:13px;margin:0 0 14px}
+label.f{display:block;font-size:13px;color:var(--mut);margin:14px 0 6px}
+input[type=text],input[type=password]{width:100%;padding:13px 12px;border-radius:10px;border:1px solid var(--line);background:#0d1117;color:var(--tx);font-size:16px;direction:ltr;text-align:left}
+input:focus{outline:2px solid var(--bl);border-color:transparent}
+.row{display:flex;gap:8px;align-items:center}
+.eye{flex:none;width:48px;height:48px;border-radius:10px;border:1px solid var(--line);background:#0d1117;color:var(--mut);font-size:18px;margin:0}
+.chk{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--mut);margin-top:8px}
+.chk input{width:18px;height:18px}
+.vis{display:flex;gap:8px}
+.vis label{flex:1;border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center;cursor:pointer;font-size:15px}
+.vis input{display:none}
+.vis label:has(input:checked){border-color:var(--bl);background:#1f6feb22}
+#pick{margin-top:16px;border:2px dashed var(--line);border-radius:12px;padding:22px 14px;text-align:center;cursor:pointer;color:var(--mut)}
+#pick.on,#pick:hover{border-color:var(--bl);color:var(--tx)}
+#pick .big{font-size:30px;display:block}
+#pick b{color:var(--tx);font-size:16px}
+#fn{margin-top:6px;color:var(--bl);font-size:13px;word-break:break-all}
+#file{display:none}
+.btn{margin-top:18px;width:100%;padding:15px;border:0;border-radius:10px;background:var(--ac);color:#fff;font-size:17px;font-weight:600;cursor:pointer}
+.btn:disabled{opacity:.5}
+.btn.cancel{background:#da3633;display:none}
+.bar{height:8px;background:#21262d;border-radius:99px;overflow:hidden;margin-top:18px;display:none}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--ac),var(--bl));transition:width .2s}
+#st{margin-top:10px;font-size:14px;min-height:22px}
+#log{margin-top:10px;max-height:170px;overflow:auto;background:#0d1117;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:12px/1.5 ui-monospace,Consolas,monospace;color:var(--mut);display:none;white-space:pre-wrap}
+.er{color:var(--er)} .ok{color:var(--ac2)}
+#done{display:none;margin-top:16px;padding:14px;border-radius:12px;background:#23863622;border:1px solid var(--ac);text-align:center}
+#done a{color:var(--bl);font-weight:600;word-break:break-all}
+.hint{font-size:12px;color:var(--mut);margin-top:6px}
+.hint a{color:var(--bl)}
+.native .webonly{display:none}
+.seg{display:flex;background:#0d1117;border:1px solid var(--line);border-radius:10px;padding:3px;margin-top:16px}
+.seg button{flex:1;border:0;background:none;color:var(--mut);padding:10px;border-radius:8px;font-size:15px;cursor:pointer}
+.seg button.on{background:#1f6feb33;color:var(--tx);font-weight:600}
+.alt{width:100%;margin-top:10px;padding:12px;border-radius:10px;border:1px solid var(--line);background:#21262d;color:var(--tx);font-size:15px;cursor:pointer}
+.mini{border:1px solid var(--line);background:#21262d;color:var(--tx);border-radius:10px;padding:0 12px;height:48px;font-size:14px;flex:none;cursor:pointer}
+#dev{display:none;margin-top:12px;padding:16px;border:1px solid var(--bl);border-radius:12px;background:#1f6feb14;text-align:center}
+#dev .code{font:700 30px/1.3 ui-monospace,Consolas,monospace;letter-spacing:4px;direction:ltr;margin:8px 0;user-select:all}
+.warn{color:#d29922;font-size:12px;margin-top:6px}
+#hist{margin-top:22px;border-top:1px solid var(--line);padding-top:14px;display:none}
+#hist h2{font-size:15px;margin:0 0 8px;display:flex;justify-content:space-between;align-items:center}
+#hist h2 button{background:none;border:0;color:var(--mut);font-size:12px;cursor:pointer}
+.hi{display:flex;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid #21262d;font-size:13px}
+.hi a{color:var(--bl);direction:ltr;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-decoration:none}
+.hi .m{color:var(--mut);font-size:11px;white-space:nowrap}
+.hi button{background:#21262d;border:1px solid var(--line);color:var(--tx);border-radius:8px;padding:4px 8px;font-size:12px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="card">
+ <h1>⬆️ ZIP إلى GitHub</h1>
+ <p class="sub">كلّ الملفات والمجلدات في التزامٍ واحد، إلى مستودعٍ جديد أو موجود.</p>
+
+ <label class="f" for="tok">التوكن (Personal Access Token)</label>
+ <div class="row">
+  <input id="tok" type="password" placeholder="ghp_... أو github_pat_..." autocomplete="off" spellcheck="false">
+  <button class="eye" id="eye" type="button" aria-label="إظهار">👁</button>
+ </div>
+ <label class="chk"><input type="checkbox" id="rem"> تذكّر التوكن <span id="remHow"></span></label>
+ <div class="hint">صلاحيتا <b>repo</b> و<b>workflow</b> (workflow يلزم إن كان في الـ ZIP مجلد .github). <a href="https://github.com/settings/tokens/new?scopes=repo,workflow&description=zip-to-github" target="_blank" rel="noopener">أنشئ توكن</a></div>
+ <button class="alt" id="login" type="button" hidden>🔑 أو سجّل الدخول عبر GitHub</button>
+ <div id="dev">
+  <div>افتح GitHub واكتب هذا الكود:</div>
+  <div class="code" id="devCode">····-····</div>
+  <button class="btn" id="devOpen" type="button" style="margin-top:6px">نسخ الكود وفتح GitHub</button>
+  <button class="alt" id="devCancel" type="button">إلغاء</button>
+  <div class="hint" id="devSt">بانتظار الموافقة…</div>
+ </div>
+
+ <div class="seg" id="mode">
+  <button type="button" data-m="new" class="on">➕ مستودع جديد</button>
+  <button type="button" data-m="existing">🔄 مستودع موجود</button>
+ </div>
+
+ <div id="newBox">
+ <label class="f" for="name">اسم المشروع الجديد</label>
+ <input id="name" type="text" placeholder="my-project" spellcheck="false" autocapitalize="off">
+
+ <label class="f">الظهور</label>
+ <div class="vis">
+  <label><input type="radio" name="vis" value="private" checked><span>🔒 خاص</span></label>
+  <label><input type="radio" name="vis" value="public"><span>🌍 عام</span></label>
+ </div>
+ </div>
+
+ <div id="exBox" hidden>
+ <label class="f" for="repo">المستودع (owner/name)</label>
+ <div class="row">
+  <input id="repo" type="text" list="repos" placeholder="user/project" spellcheck="false" autocapitalize="off">
+  <button class="mini" id="loadRepos" type="button">مستودعاتي</button>
+ </div>
+ <datalist id="repos"></datalist>
+ <label class="f">طريقة التحديث</label>
+ <div class="vis">
+  <label><input type="radio" name="how" value="merge" checked><span>➕ دمج</span></label>
+  <label><input type="radio" name="how" value="replace"><span>♻️ استبدال كامل</span></label>
+ </div>
+ <div class="hint" id="howHint">يضيف ملفات الـ ZIP ويحدّث المتشابه، ويُبقي باقي ملفات المستودع.</div>
+ </div>
+
+ <label class="f" for="msg">رسالة الالتزام (اختياري)</label>
+ <input id="msg" type="text" placeholder="رفع project.zip" style="direction:rtl;text-align:right">
+
+ <div id="pick"><span class="big">🗂️</span><b>اختر ملف ZIP</b><div class="hint webonly">أو اسحبه هنا</div><div class="hint nativeonly"></div><div id="fn"></div></div>
+ <input id="file" type="file" accept=".zip,application/zip,application/x-zip-compressed,application/octet-stream">
+
+ <button class="btn" id="go">ارفع إلى GitHub</button>
+ <button class="btn cancel" id="stop">إلغاء</button>
+ <div class="bar" id="bar"><i></i></div>
+ <div id="st"></div>
+ <div id="log"></div>
+ <div id="done">✅ تم الرفع<br><a id="link" target="_blank" rel="noopener"></a></div>
+
+ <div id="hist"><h2>🕘 آخر عمليات الرفع <button id="histClear" type="button">مسح</button></h2><div id="histList"></div></div>
+</div>
+
+<script>
+/*@@CORE-BEGIN*/
+/* ═══ مصادرُ القراءة ═══ كلُّها {size, name, read(off,len)→Uint8Array}
+   فلا يُحمَّل الـ ZIP كاملاً في الذاكرة أبداً: يُقرأ الدليلُ المركزيّ من
+   النهاية ثم كلُّ ملفٍّ وحده. */
+function fileSource(f){
+ return {size:f.size,name:f.name,
+  async read(off,len){return new Uint8Array(await f.slice(off,off+len).arrayBuffer())}};
+}
+async function nativeSource(info,bridge,url){
+ /* ملفٌّ وصل من قائمة المشاركة: نجرّب Range عبر الخادم المحلّي، وإلّا الجسر */
+ const size=info.size, name=info.name||"shared.zip";
+ if(url){
+  try{
+   const r=await fetch(url,{headers:{Range:"bytes=0-0"}});
+   if(r.status===206){ await r.arrayBuffer();
+    return {size,name,async read(off,len){
+     const q=await fetch(url,{headers:{Range:`bytes=${off}-${off+len-1}`}});
+     if(q.status!==206)throw new Error("قراءة جزئية فشلت");
+     return new Uint8Array(await q.arrayBuffer());
+    }};
+   }
+  }catch(e){}
+ }
+ return {size,name,async read(off,len){
+  const r=await bridge.read({path:info.path,offset:off,length:len});
+  const s=atob(r.data||""), u=new Uint8Array(s.length);
+  for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);
+  return u;
+ }};
+}
+
+/* ═══ قارئ ZIP بلا مكتبات (ZIP64 مدعوم) ═══ */
+async function readZip(src){
+ const tailLen=Math.min(src.size,65557+22);
+ const tailOff=src.size-tailLen;
+ const tail=await src.read(tailOff,tailLen);
+ const tv=new DataView(tail.buffer,tail.byteOffset,tail.byteLength);
+ let e=-1;
+ for(let i=tail.length-22;i>=0;i--)if(tv.getUint32(i,true)===0x06054b50){e=i;break}
+ if(e<0)throw new Error("الملف ليس ZIP صالحاً");
+ let count=tv.getUint16(e+10,true), cdSize=tv.getUint32(e+12,true), cdOff=tv.getUint32(e+16,true);
+ if(cdOff===0xFFFFFFFF||count===0xFFFF||cdSize===0xFFFFFFFF){
+  const l=e-20;
+  if(l<0||tv.getUint32(l,true)!==0x07064b50)throw new Error("ZIP64 تالف");
+  const zOff=Number(tv.getBigUint64(l+8,true));
+  const z=await src.read(zOff,56), zv=new DataView(z.buffer,z.byteOffset,z.byteLength);
+  if(zv.getUint32(0,true)!==0x06064b50)throw new Error("ZIP64 تالف");
+  count=Number(zv.getBigUint64(32,true)); cdSize=Number(zv.getBigUint64(40,true)); cdOff=Number(zv.getBigUint64(48,true));
+ }
+ const cd=await src.read(cdOff,cdSize), dv=new DataView(cd.buffer,cd.byteOffset,cd.byteLength);
+ const utf=new TextDecoder("utf-8"), out=[]; let p=0;
+ for(let n=0;n<count;n++){
+  if(dv.getUint32(p,true)!==0x02014b50)throw new Error("الدليل المركزي تالف");
+  const flags=dv.getUint16(p+8,true), method=dv.getUint16(p+10,true);
+  let csize=dv.getUint32(p+20,true), usize=dv.getUint32(p+24,true);
+  const nl=dv.getUint16(p+28,true), xl=dv.getUint16(p+30,true), cl=dv.getUint16(p+32,true);
+  const ext=dv.getUint32(p+38,true); let lho=dv.getUint32(p+42,true);
+  const name=utf.decode(cd.subarray(p+46,p+46+nl));
+  let x=p+46+nl; const xe=x+xl;
+  while(x+4<=xe){
+   const id=dv.getUint16(x,true), sz=dv.getUint16(x+2,true);
+   if(id===1){let q=x+4;
+    if(usize===0xFFFFFFFF){usize=Number(dv.getBigUint64(q,true));q+=8}
+    if(csize===0xFFFFFFFF){csize=Number(dv.getBigUint64(q,true));q+=8}
+    if(lho===0xFFFFFFFF)lho=Number(dv.getBigUint64(q,true));
+   }
+   x+=4+sz;
+  }
+  p=xe+cl;
+  const unix=(ext>>>16)&0xFFFF, type=unix&0xF000;
+  if(name.endsWith("/")||type===0x4000)continue;
+  if(flags&1)throw new Error("الملف مشفّر بكلمة مرور: "+name);
+  out.push({name,method,csize,usize,lho,exec:!!(unix&0o111)&&type!==0xA000,link:type===0xA000});
+ }
+ return {entries:out,
+  async data(en){
+   const h=await src.read(en.lho,30), hv=new DataView(h.buffer,h.byteOffset,h.byteLength);
+   if(hv.getUint32(0,true)!==0x04034b50)throw new Error("ترويسة تالفة: "+en.name);
+   const s=en.lho+30+hv.getUint16(26,true)+hv.getUint16(28,true);
+   const raw=await src.read(s,en.csize);
+   if(en.method===0)return raw;
+   if(en.method!==8)throw new Error("ضغطٌ غير مدعوم ("+en.method+"): "+en.name);
+   const ds=new Blob([raw]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+   return new Uint8Array(await new Response(ds).arrayBuffer());
+  }};
+}
+const SKIP=/(^|\/)(__MACOSX|\.DS_Store|Thumbs\.db|desktop\.ini)(\/|$)|(^|\/)\.git\//;
+function stripRoot(names){
+ if(!names.length)return "";
+ const f=names[0].split("/")[0];
+ return names.every(n=>n.includes("/")&&n.split("/")[0]===f)?f+"/":"";
+}
+function asText(b){
+ if(b.length>1024*1024)return null;
+ for(let i=0,n=Math.min(b.length,8000);i<n;i++)if(b[i]===0)return null;
+ try{return new TextDecoder("utf-8",{fatal:true}).decode(b)}catch(e){return null}
+}
+function b64(b){
+ let s="";const C=0x8000;
+ for(let i=0;i<b.length;i+=C)s+=String.fromCharCode.apply(null,b.subarray(i,i+C));
+ return btoa(s);
+}
+const cleanName=s=>String(s||"").trim().replace(/\s+/g,"-").replace(/[^A-Za-z0-9._-]/g,"").replace(/^\.+/,"").slice(0,100);
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+/* ═══ عميل GitHub: إعادةُ محاولةٍ عند حدّ المعدّل/أخطاء الخادم/انقطاع الشبكة ═══ */
+function ghClient(o){
+ const API=o.api||"https://api.github.com", F=o.fetch||fetch, signal=o.signal, log=o.log||(()=>{});
+ const chk=()=>{if(signal&&signal.aborted)throw new Error("أُلغي الرفع")};
+ async function gh(method,path,body,tries=6){
+  for(let a=0;;a++){
+   chk(); let r;
+   try{
+    r=await F(API+path,{method,signal,headers:{"Authorization":"Bearer "+o.token,
+     "Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28",
+     ...(body?{"Content-Type":"application/json"}:{})},body:body?JSON.stringify(body):undefined});
+   }catch(e){chk(); if(a<tries){await sleep(o.fastRetry?1:1000*(a+1));continue} throw new Error("تعذّر الاتصال بـ GitHub، تحقّق من الإنترنت")}
+   if(r.ok){
+    if(path==="/user"){const h=r.headers&&r.headers.get&&r.headers.get("x-oauth-scopes"); gh.scopes=typeof h==="string"?h:null}
+    return r.status===204?null:r.json();
+   }
+   const j=await r.json().catch(()=>({}));
+   const ra=+(r.headers.get&&r.headers.get("retry-after"))||0;
+   const lim=r.status===429||(r.status===403&&/rate limit|abuse|secondary/i.test(j.message||""));
+   if((lim||r.status>=500||(r.status===404&&method==="GET"&&a<3&&tries>0))&&a<tries){
+    const w=ra?ra*1000:Math.min(30000,1500*2**a);
+    if(lim)log(`⏳ حدّ GitHub المؤقت، انتظار ${Math.round(w/1000)} ث`);
+    await sleep(o.fastRetry?1:w); continue;
+   }
+   const err=new Error(j.message||("HTTP "+r.status)); err.status=r.status; throw err;
+  }
+ }
+ gh.chk=chk;
+ return gh;
+}
+/* مستودعاتُ المستخدم (مالكاً أو متعاوناً)، الأحدثُ أوّلاً */
+async function listRepos(o){
+ const gh=ghClient(o), out=[];
+ for(let page=1;page<=10;page++){
+  const r=await gh("GET",`/user/repos?per_page=100&sort=pushed&affiliation=owner,collaborator,organization_member&page=${page}`);
+  out.push(...r.filter(x=>!x.archived&&x.permissions&&x.permissions.push).map(x=>({full:x.full_name,priv:x.private,branch:x.default_branch,url:x.html_url})));
+  if(r.length<100)break;
+ }
+ return out;
+}
+
+/* ═══ الرفع ═══
+   o.mode: "new" (مستودعٌ جديد) أو "existing" (o.repo = "owner/name")
+   o.replace: في الموجود، true = المستودعُ يصير مطابقاً للـ ZIP، false = إضافةٌ/تحديثٌ فقط
+   النصوصُ داخل الشجرة مباشرةً والثنائياتُ blobs بالتوازي؛ الشجرةُ على دفعاتٍ
+   أثناء القراءة (ذاكرةٌ محدودة)؛ التزامٌ واحد. */
+async function uploadZip(o){
+ const {src,name,priv,signal}=o, mode=o.mode||"new";
+ const say=o.status||(()=>{}), log=o.log||(()=>{}), prog=o.progress||(()=>{});
+ const gh=ghClient({...o,log}), chk=gh.chk;
+ const t0=Date.now();
+ say("قراءة الملف…");
+ const zip=await readZip(src);
+ const ents=zip.entries.filter(e=>!SKIP.test(e.name));
+ const root=stripRoot(ents.map(e=>e.name));
+ if(root)log("المجلد الجذري «"+root+"» أُزيل، الملفات في جذر المستودع");
+ if(!ents.length)throw new Error("الـ ZIP فارغ");
+ const big=ents.filter(e=>e.usize>100*1048576);
+ if(big.length)throw new Error("GitHub يرفض الملفات فوق 100 م.ب: "+big.map(e=>e.name).join("، "));
+ log(`📦 ${ents.length} ملف`);
+
+ say("التحقق من التوكن…");
+ const me=await gh("GET","/user").catch(e=>{throw new Error(e.status===401?"التوكن غير صالح أو منتهي":e.message)});
+ log("👤 "+me.login);
+ /* GitHub يرفض (404) أيَّ كتابةٍ في .github/workflows بلا صلاحية «workflow» حتى مع repo */
+ const hasWf=ents.some(e=>/^\.github\/workflows\//.test(e.name.slice(root.length)));
+ const WF_MSG="الـ ZIP فيه .github/workflows لكنّ التوكن بلا صلاحية «workflow». أنشئ توكناً جديداً بصلاحيتَي repo و workflow (للتوكن الدقيق: Workflows ← Read and write) أو سجّل الدخول عبر GitHub من جديد، ثم أعد المحاولة";
+ const wfErr=e=>hasWf&&e&&(e.status===404||e.status===403)?Object.assign(new Error(WF_MSG+" ["+e.message+"]"),{status:e.status}):e;
+ if(hasWf&&typeof gh.scopes==="string"&&!/(^|[\s,])workflow(?=[\s,]|$)/.test(gh.scopes))throw new Error(WF_MSG);
+ let repo, full, br, head=null, baseTree=null;
+ if(mode==="new"){
+  say("إنشاء المستودع…");
+  try{repo=await gh("POST","/user/repos",{name,private:priv,auto_init:true})}
+  catch(e){
+   if(e.status===422)throw new Error(`يوجد مستودع باسم «${name}» في حسابك، اختر اسماً آخر أو استعمل «مستودع موجود»`);
+   if(e.status===403||e.status===404)throw new Error("التوكن لا يملك صلاحية إنشاء مستودعات (repo)");
+   throw e;
+  }
+  full=repo.full_name; br=repo.default_branch||"main";
+  log("✓ "+full+(priv?" (خاص)":" (عام)"),"ok");
+  for(let a=0;a<10&&!head;a++){try{head=(await gh("GET",`/repos/${full}/git/ref/heads/${br}`,null,0)).object.sha}catch(e){chk();await sleep(o.fastRetry?1:800)}}
+  if(!head)throw new Error("المستودع لم يجهز بعد، أعد المحاولة");
+ }else{
+  full=String(o.repo||"").trim().replace(/^https?:\/\/github\.com\//,"").replace(/\.git$/,"").replace(/\/+$/,"");
+  if(!/^[\w.-]+\/[\w.-]+$/.test(full))throw new Error("اكتب المستودع بالشكل owner/name");
+  say("فتح المستودع…");
+  try{repo=await gh("GET",`/repos/${full}`)}
+  catch(e){throw new Error(e.status===404?`لم أجد «${full}» أو التوكن لا يصل إليه`:e.message)}
+  if(repo.permissions&&!repo.permissions.push)throw new Error("لا تملك صلاحية الكتابة في "+full);
+  br=o.branch||repo.default_branch||"main";
+  try{
+   head=(await gh("GET",`/repos/${full}/git/ref/heads/${br}`,null,0)).object.sha;
+   if(!o.replace)baseTree=(await gh("GET",`/repos/${full}/git/commits/${head}`)).tree.sha;
+  }catch(e){
+   if(e.status!==404&&e.status!==409)throw e;
+   /* مستودعٌ فارغ: Git Data API لا يعمل قبل أوّل التزام، فنُنشئه بملفٍّ مؤقّت */
+   log("المستودع فارغ، أنشأتُ التزاماً أوّلياً");
+   const c=await gh("PUT",`/repos/${full}/contents/.zip2github`,{message:"init",content:"Cg==",branch:br});
+   head=c.commit.sha;
+  }
+  log("✓ "+full+" ← "+br+(o.replace?" (استبدال كامل)":" (دمج: إضافة وتحديث)"),"ok");
+ }
+ prog(.04);
+
+ /* دفعاتُ الشجرة: تُرسَل متسلسلةً كلّما تجاوز المعلَّقُ ~8 م.ب */
+ let tree=baseTree, pend=[], pendSz=0, chain=Promise.resolve(), nText=0, nBin=0, treeCalls=0;
+ const flush=()=>{
+  if(!pend.length)return chain;
+  const batch=pend; pend=[]; pendSz=0;
+  chain=chain.then(async()=>{
+   const body={tree:batch}; if(tree)body.base_tree=tree;
+   tree=(await gh("POST",`/repos/${full}/git/trees`,body).catch(e=>{throw wfErr(e)})).sha; treeCalls++;
+  });
+  return chain;
+ };
+ const add=(it,sz)=>{pend.push(it); pendSz+=sz+it.path.length+64;
+  if(pendSz>8e6||pend.length>=3000)return flush()};
+
+ let done=0; const total=ents.length; let i=0;
+ say(`رفع الملفات 0/${total}…`);
+ const worker=async()=>{
+  while(i<ents.length){
+   const e=ents[i++]; chk();
+   const path=e.name.slice(root.length);
+   if(path){
+    const bytes=await zip.data(e);
+    const mode=e.link?"120000":e.exec?"100755":"100644";
+    const txt=e.link?new TextDecoder().decode(bytes):asText(bytes);
+    if(txt!==null){nText++; await add({path,mode,type:"blob",content:txt},txt.length)}
+    else{
+     const r=await gh("POST",`/repos/${full}/git/blobs`,{content:b64(bytes),encoding:"base64"});
+     nBin++; await add({path,mode,type:"blob",sha:r.sha},0);
+    }
+   }
+   done++; say(`رفع الملفات ${done}/${total}…`); prog(.04+.88*done/total);
+  }
+ };
+ await Promise.all(Array.from({length:Math.min(4,ents.length)},worker));
+ await flush(); await chain;
+ if(!tree)throw new Error("لا ملفات بعد إزالة الجذر");
+ log(`📝 ${nText} نصّي · 🧱 ${nBin} ثنائي · 🌳 ${treeCalls} دفعة شجرة`);
+ say("إنشاء الالتزام…");
+ const msg=(o.message||"").trim()||("رفع "+(src.name||"zip"));
+ const commit=await gh("POST",`/repos/${full}/git/commits`,{message:msg,tree,parents:[head]}).catch(e=>{throw wfErr(e)});
+ try{await gh("PATCH",`/repos/${full}/git/refs/heads/${br}`,{sha:commit.sha,force:mode==="new"})}
+ catch(e){ if(e.status===422)throw new Error("الفرع تغيّر أثناء الرفع (دفعٌ من مكانٍ آخر)، أعد المحاولة"); throw wfErr(e) }
+ prog(1);
+ return {url:repo.html_url,full,branch:br,mode,files:nText+nBin,sec:((Date.now()-t0)/1000).toFixed(1),commit:commit.sha};
+}
+
+/* ═══ تسجيل الدخول عبر GitHub (Device Flow) ═══
+   post(url, body) → JSON. في التطبيق عبر CapacitorHttp (نقاطُ Device Flow
+   لا تدعم CORS، فلا تعمل من موقعٍ عادي). */
+async function deviceLogin({clientId,post,onCode,signal,scope="repo workflow",wait=sleep}){
+ if(!clientId)throw new Error("لم يُضبَط Client ID لتطبيق OAuth");
+ const d=await post("https://github.com/login/device/code",{client_id:clientId,scope});
+ if(!d||!d.device_code)throw new Error((d&&(d.error_description||d.error))||"تعذّر بدء تسجيل الدخول، تأكّد من تفعيل Device Flow في تطبيق OAuth");
+ onCode&&onCode(d);
+ let iv=(d.interval||5)*1000; const until=Date.now()+(d.expires_in||900)*1000;
+ while(Date.now()<until){
+  await wait(iv);
+  if(signal&&signal.aborted)throw new Error("أُلغي تسجيل الدخول");
+  let r;
+  try{r=await post("https://github.com/login/oauth/access_token",{client_id:clientId,device_code:d.device_code,grant_type:"urn:ietf:params:oauth:grant-type:device_code"})}
+  catch(e){continue}
+  r=r||{};
+  if(r.access_token)return r.access_token;
+  if(r.error==="authorization_pending")continue;
+  if(r.error==="slow_down"){iv=((r.interval||0)*1000)||iv+5000;continue}
+  if(r.error==="access_denied")throw new Error("رفضتَ الإذن في GitHub");
+  if(r.error==="expired_token")break;
+  throw new Error(r.error_description||r.error||"فشل تسجيل الدخول");
+ }
+ throw new Error("انتهت مهلة الكود، أعد المحاولة");
+}
+/*@@CORE-END*/
+
+
+/* ═══ الواجهة ═══ */
+const $=s=>document.querySelector(s);
+const CAP=window.Capacitor, NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform());
+const P=n=>{try{return CAP&&(CAP.Plugins&&CAP.Plugins[n]||CAP.registerPlugin&&CAP.registerPlugin(n))}catch(e){return null}};
+const ZB=NATIVE?P("ZipBridge"):null, APP=NATIVE?P("App"):null, LN=NATIVE?P("LocalNotifications"):null;
+if(NATIVE)document.documentElement.classList.add("native");
+let SRC=null, RUN=null;
+
+const log=(m,c)=>{const L=$("#log");L.style.display="block";const d=document.createElement("div");if(c)d.className=c;d.textContent=m;L.appendChild(d);L.scrollTop=L.scrollHeight};
+const st=(m,c)=>{const e=$("#st");e.textContent=m;e.className=c||""};
+const prog=f=>{$("#bar").style.display="block";$("#bar i").style.width=Math.round(f*100)+"%"};
+const mb=n=>(n/1048576).toFixed(2)+" م.ب";
+
+function setSource(src){
+ SRC=src; $("#fn").textContent=`${src.name} · ${mb(src.size)}`;
+ const n=$("#name"); if(!n.value)n.value=cleanName(src.name.replace(/\.zip$/i,""));
+ if(!/\.zip$/i.test(src.name))st("⚠ الاسم لا ينتهي بـ .zip، سأحاول قراءته كـ ZIP","er"); else st("");
+}
+$("#pick").onclick=()=>$("#file").click();
+$("#file").onchange=e=>{const f=e.target.files[0]; if(f)setSource(fileSource(f))};
+["dragenter","dragover"].forEach(t=>$("#pick").addEventListener(t,e=>{e.preventDefault();$("#pick").classList.add("on")}));
+["dragleave","drop"].forEach(t=>$("#pick").addEventListener(t,e=>{e.preventDefault();$("#pick").classList.remove("on")}));
+$("#pick").addEventListener("drop",e=>{const f=e.dataTransfer.files[0]; if(f)setSource(fileSource(f))});
+$("#eye").onclick=()=>{const t=$("#tok");t.type=t.type==="password"?"text":"password"};
+
+/* ═══ التوكن: Keystore في التطبيق، localStorage في المتصفّح ═══ */
+$("#remHow").textContent=NATIVE?"(مشفّر في Android Keystore)":"(في هذا المتصفّح)";
+async function loadToken(){
+ try{
+  if(ZB){const r=await ZB.getToken(); if(r&&r.token){$("#tok").value=r.token;$("#rem").checked=true}}
+  else{const t=localStorage.getItem("z2g_tok")||sessionStorage.getItem("z2g_tok"); if(t){$("#tok").value=t;$("#rem").checked=!!localStorage.getItem("z2g_tok")}}
+ }catch(e){}
+}
+async function saveToken(t){
+ try{
+  if(ZB){ if($("#rem").checked)await ZB.setToken({token:t}); else await ZB.clearToken() }
+  else{ if($("#rem").checked)localStorage.setItem("z2g_tok",t); else{localStorage.removeItem("z2g_tok");sessionStorage.setItem("z2g_tok",t)} }
+ }catch(e){log("تعذّر حفظ التوكن: "+e.message,"er")}
+}
+$("#rem").onchange=()=>{ if(!$("#rem").checked){ try{ZB?ZB.clearToken():localStorage.removeItem("z2g_tok")}catch(e){} } };
+loadToken();
+
+/* ═══ ملفٌّ من قائمة المشاركة (تيليجرام، واتساب، مدير الملفات…) ═══ */
+async function onShared(info){
+ if(!info||!info.path){ if(info&&info.error)st("❌ تعذّر استلام الملف: "+info.error,"er"); return }
+ if(RUN){log("وصل ملفٌّ جديد أثناء الرفع، تجاهلته","er");return}
+ const url=CAP.convertFileSrc?CAP.convertFileSrc("file://"+info.path):null;
+ setSource(await nativeSource(info,ZB,url));
+ log("📥 استُلم من المشاركة: "+info.name);
+}
+if(ZB){
+ try{ZB.addListener("shared",onShared)}catch(e){}
+ ZB.getPending().then(r=>{if(r&&r.path)onShared(r)}).catch(()=>{});
+ document.querySelector(".nativeonly").textContent="أو شارك ملف ZIP إلى هذا التطبيق من أي مكان";
+}
+
+/* ═══ زرّ الرجوع ═══ */
+if(APP&&APP.addListener)APP.addListener("backButton",()=>{
+ if(typeof DEV!=="undefined"&&DEV){DEV.abort();return}
+ if(RUN){ if(confirm("إلغاء الرفع الجاري؟"))RUN.abort() }
+ else APP.exitApp&&APP.exitApp();
+});
+
+async function notify(title,body){
+ if(!LN)return;
+ try{await LN.schedule({notifications:[{id:Date.now()%2147483647,title,body}]})}catch(e){}
+}
+
+/* ═══ الوضع: جديد / موجود ═══ */
+let MODE="new";
+function setMode(m){
+ MODE=m;
+ document.querySelectorAll("#mode button").forEach(b=>b.classList.toggle("on",b.dataset.m===m));
+ $("#newBox").hidden=m!=="new"; $("#exBox").hidden=m!=="existing";
+ try{localStorage.setItem("z2g_mode",m)}catch(e){}
+}
+document.querySelectorAll("#mode button").forEach(b=>b.onclick=()=>setMode(b.dataset.m));
+setMode(localStorage.getItem("z2g_mode")==="existing"?"existing":"new");
+document.querySelectorAll("input[name=how]").forEach(r=>r.onchange=()=>{
+ $("#howHint").textContent=r.value==="replace"&&r.checked
+  ?"⚠ المستودع يصير مطابقاً للـ ZIP تماماً: أي ملف غير موجود في الـ ZIP يُحذف (يبقى في سجلّ Git)."
+  :"يضيف ملفات الـ ZIP ويحدّث المتشابه، ويُبقي باقي ملفات المستودع.";
+});
+$("#loadRepos").onclick=async()=>{
+ const token=$("#tok").value.trim(); if(!token)return st("أدخل التوكن أولاً","er");
+ $("#loadRepos").disabled=true; st("تحميل مستودعاتك…");
+ try{
+  const L=await listRepos({token});
+  $("#repos").innerHTML="";
+  for(const r of L){const o=document.createElement("option");o.value=r.full;o.label=(r.priv?"🔒 ":"🌍 ")+r.full;$("#repos").appendChild(o)}
+  st(`${L.length} مستودع، ابدأ بكتابة الاسم واختر`,"ok"); $("#repo").focus();
+ }catch(e){st("❌ "+e.message,"er")}
+ finally{$("#loadRepos").disabled=false}
+};
+
+/* ═══ السجلّ ═══ */
+const HK="z2g_hist";
+const hist=()=>{try{return JSON.parse(localStorage.getItem(HK)||"[]")}catch(e){return []}};
+function addHist(r){
+ const h=hist(); h.unshift({full:r.full,url:r.url,files:r.files,mode:r.mode,at:Date.now()});
+ try{localStorage.setItem(HK,JSON.stringify(h.slice(0,30)))}catch(e){}
+ renderHist();
+}
+function renderHist(){
+ const h=hist(), L=$("#histList"); $("#hist").style.display=h.length?"block":"none"; L.innerHTML="";
+ for(const x of h){
+  const d=document.createElement("div"); d.className="hi";
+  const a=document.createElement("a"); a.href=x.url; a.target="_blank"; a.rel="noopener"; a.textContent=x.full;
+  const m=document.createElement("span"); m.className="m";
+  m.textContent=`${x.mode==="existing"?"🔄":"➕"} ${x.files} ملف · ${new Date(x.at).toLocaleDateString("ar",{day:"numeric",month:"short"})}`;
+  const b=document.createElement("button"); b.type="button"; b.textContent="↻ تحديث"; b.title="ارفع إليه مرة أخرى";
+  b.onclick=()=>{setMode("existing"); $("#repo").value=x.full; $("#repo").scrollIntoView({behavior:"smooth",block:"center"})};
+  d.append(a,m,b); L.appendChild(d);
+ }
+}
+$("#histClear").onclick=()=>{ if(confirm("مسح السجلّ؟")){localStorage.removeItem(HK);renderHist()} };
+renderHist();
+
+/* ═══ تسجيل الدخول عبر GitHub (Device Flow، في التطبيق فقط) ═══ */
+const CLIENT_ID="__GITHUB_CLIENT_ID__";
+const HTTP=NATIVE?P("CapacitorHttp"):null;
+const HAS_ID=!!CLIENT_ID&&!/^__/.test(CLIENT_ID);
+if(HTTP&&HAS_ID)$("#login").hidden=false;
+let DEV=null, DEVINFO=null;
+async function nativePost(url,body){
+ const r=await HTTP.request({url,method:"POST",headers:{"Accept":"application/json","Content-Type":"application/json"},data:body});
+ let d=r.data; if(typeof d==="string"){try{d=JSON.parse(d)}catch(e){d={error:d}}}
+ return d;
+}
+$("#login").onclick=async()=>{
+ DEV=new AbortController(); $("#dev").style.display="block"; $("#login").hidden=true;
+ $("#devCode").textContent="····-····"; $("#devSt").textContent="جارٍ طلب الكود…";
+ try{
+  const token=await deviceLogin({clientId:CLIENT_ID,post:nativePost,signal:DEV.signal,
+   onCode:d=>{DEVINFO=d; $("#devCode").textContent=d.user_code; $("#devSt").textContent="بانتظار موافقتك في GitHub…"}});
+  $("#tok").value=token; $("#rem").checked=true; await saveToken(token);
+  st("✅ تم تسجيل الدخول","ok");
+ }catch(e){ if(!/أُلغي/.test(e.message))st("❌ "+e.message,"er") }
+ finally{ DEV=null; $("#dev").style.display="none"; $("#login").hidden=false }
+};
+$("#devOpen").onclick=async()=>{
+ if(!DEVINFO)return;
+ try{await navigator.clipboard.writeText(DEVINFO.user_code); $("#devSt").textContent="نُسخ الكود، الصقه في GitHub"}catch(e){}
+ window.open(DEVINFO.verification_uri,"_blank");
+};
+$("#devCancel").onclick=()=>{ if(DEV)DEV.abort() };
+
+/* ═══ الرفع في الخلفية: خدمةٌ أماميّة بإشعار تقدّم ═══ */
+let lastBg=0;
+const bg={
+ start:async t=>{if(ZB)try{await ZB.bgStart({title:t,text:"بدء…"})}catch(e){log("خدمة الخلفية: "+e.message)}},
+ update:(t,text,pct)=>{ if(!ZB)return; const n=Date.now(); if(n-lastBg<1000&&pct<100)return; lastBg=n;
+  ZB.bgUpdate({title:t,text,pct:Math.round(pct)}).catch(()=>{}) },
+ stop:async()=>{if(ZB)try{await ZB.bgStop()}catch(e){}}
+};
+
+$("#stop").onclick=()=>{ if(RUN)RUN.abort() };
+$("#go").onclick=async()=>{
+ const token=$("#tok").value.trim();
+ if(!token)return st("أدخل التوكن أو سجّل الدخول","er");
+ if(!SRC)return st("اختر ملف ZIP","er");
+ if(!("DecompressionStream" in window))return st("المتصفّح قديم، حدّث Chrome أو Android System WebView","er");
+ const opt={src:SRC,token,mode:MODE,message:$("#msg").value};
+ let label;
+ if(MODE==="new"){
+  const name=cleanName($("#name").value);
+  if(!name)return st("أدخل اسماً صالحاً (حروف إنجليزية وأرقام و - _ .)","er");
+  $("#name").value=name; opt.name=name;
+  opt.priv=document.querySelector("input[name=vis]:checked").value==="private";
+  label=name;
+ }else{
+  opt.repo=$("#repo").value.trim(); if(!opt.repo)return st("اكتب المستودع أو اختره من «مستودعاتي»","er");
+  opt.replace=document.querySelector("input[name=how]:checked").value==="replace";
+  if(opt.replace&&!confirm(`استبدال كامل لمحتوى ${opt.repo}؟\nكل ملف غير موجود في الـ ZIP سيُحذف من الفرع (يبقى في سجلّ Git).`))return;
+  label=opt.repo;
+ }
+ await saveToken(token);
+ RUN=new AbortController(); opt.signal=RUN.signal;
+ $("#go").style.display="none"; $("#stop").style.display="block";
+ $("#done").style.display="none"; $("#log").innerHTML=""; prog(0);
+ if(LN){try{await LN.requestPermissions()}catch(e){}}
+ if(ZB){try{await ZB.keepAwake({on:true})}catch(e){}}
+ const title="⬆️ "+label; await bg.start(title);
+ let P0=0;
+ opt.status=m=>{st(m); bg.update(title,m,P0*100)};
+ opt.progress=f=>{P0=f; prog(f)};
+ opt.log=log;
+ try{
+  const r=await uploadZip(opt);
+  st(`تم: ${r.files} ملف في ${r.sec} ث`,"ok"); log("✓ commit "+r.commit.slice(0,7)+" ← "+r.branch,"ok");
+  $("#link").href=r.url; $("#link").textContent=r.url; $("#done").style.display="block";
+  addHist(r);
+  await bg.stop();
+  notify("✅ تم الرفع",`${r.full} · ${r.files} ملف`);
+  if(ZB)ZB.clearShared().catch(()=>{});
+ }catch(e){
+  await bg.stop();
+  const m=e.message||String(e); st("❌ "+m,"er"); log(m,"er");
+  if(!/أُلغي/.test(m))notify("❌ فشل الرفع",m);
+ }finally{
+  RUN=null; $("#go").style.display="block"; $("#stop").style.display="none";
+  if(ZB){try{await ZB.keepAwake({on:false})}catch(e){}}
+ }
+};
+</script>
+</body>
+</html>
