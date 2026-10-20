@@ -1,0 +1,11 @@
+{
+  "appId": "com.ziptogithub.app",
+  "appName": "ZIP إلى GitHub",
+  "webDir": "www",
+  "server": { "androidScheme": "https" },
+  "android": { "allowMixedContent": false, "webContentsDebuggingEnabled": false },
+  "plugins": {
+    "SplashScreen": { "launchShowDuration": 800, "launchAutoHide": true, "backgroundColor": "#0d1117", "showSpinner": false },
+    "LocalNotifications": { "iconColor": "#2ea043" }
+  }
+}
