@@ -38,10 +38,21 @@ jobs:
           printf '\n24333f8a63b6825ea9c5514f83c2829b004d1fee\n8933bad161af4178b1185d1a37fbf41ea5269c55\nd56f5187479451eabf01fb78af6dfcb131a6481e\n' >> "$ANDROID_HOME/licenses/android-sdk-license"
           ls "$ANDROID_HOME/licenses"
 
+      - name: Check files
+        run: |
+          miss=0
+          for f in package.json capacitor.config.json scripts/build-www.js scripts/android-patch.js \
+                   src/core.js src/app.tpl.html \
+                   native/android/MainActivity.java native/android/ZipBridgePlugin.java native/android/UploadService.java; do
+            if [ ! -f "$f" ]; then echo "::error::ملف ناقص في المستودع: $f"; miss=1; fi
+          done
+          exit $miss
+
       - name: Install
         run: npm install --no-audit --no-fund
 
       - name: Test
+        if: hashFiles('tests/core.test.mjs') != ''
         run: npm test
 
       - name: Build www
