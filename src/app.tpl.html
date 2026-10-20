@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+<meta name="theme-color" content="#0d1117">
+<link rel="icon" href="icon.png">
+<title>ZIP إلى GitHub</title>
+<style>
+:root{--bg:#0d1117;--card:#161b22;--line:#30363d;--tx:#e6edf3;--mut:#8b949e;--ac:#238636;--ac2:#2ea043;--er:#f85149;--bl:#58a6ff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{overscroll-behavior:none}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--tx);font:15px/1.6 system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;display:flex;justify-content:center;
+ padding:calc(18px + env(safe-area-inset-top)) 14px calc(18px + env(safe-area-inset-bottom))}
+.card{width:100%;max-width:560px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;align-self:flex-start}
+h1{font-size:20px;margin:0 0 4px;display:flex;gap:10px;align-items:center}
+.sub{color:var(--mut);font-size:13px;margin:0 0 14px}
+label.f{display:block;font-size:13px;color:var(--mut);margin:14px 0 6px}
+input[type=text],input[type=password]{width:100%;padding:13px 12px;border-radius:10px;border:1px solid var(--line);background:#0d1117;color:var(--tx);font-size:16px;direction:ltr;text-align:left}
+input:focus{outline:2px solid var(--bl);border-color:transparent}
+.row{display:flex;gap:8px;align-items:center}
+.eye{flex:none;width:48px;height:48px;border-radius:10px;border:1px solid var(--line);background:#0d1117;color:var(--mut);font-size:18px;margin:0}
+.chk{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--mut);margin-top:8px}
+.chk input{width:18px;height:18px}
+.vis{display:flex;gap:8px}
+.vis label{flex:1;border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center;cursor:pointer;font-size:15px}
+.vis input{display:none}
+.vis label:has(input:checked){border-color:var(--bl);background:#1f6feb22}
+#pick{margin-top:16px;border:2px dashed var(--line);border-radius:12px;padding:22px 14px;text-align:center;cursor:pointer;color:var(--mut)}
+#pick.on,#pick:hover{border-color:var(--bl);color:var(--tx)}
+#pick .big{font-size:30px;display:block}
+#pick b{color:var(--tx);font-size:16px}
+#fn{margin-top:6px;color:var(--bl);font-size:13px;word-break:break-all}
+#file{display:none}
+.btn{margin-top:18px;width:100%;padding:15px;border:0;border-radius:10px;background:var(--ac);color:#fff;font-size:17px;font-weight:600;cursor:pointer}
+.btn:disabled{opacity:.5}
+.btn.cancel{background:#da3633;display:none}
+.bar{height:8px;background:#21262d;border-radius:99px;overflow:hidden;margin-top:18px;display:none}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--ac),var(--bl));transition:width .2s}
+#st{margin-top:10px;font-size:14px;min-height:22px}
+#log{margin-top:10px;max-height:170px;overflow:auto;background:#0d1117;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:12px/1.5 ui-monospace,Consolas,monospace;color:var(--mut);display:none;white-space:pre-wrap}
+.er{color:var(--er)} .ok{color:var(--ac2)}
+#done{display:none;margin-top:16px;padding:14px;border-radius:12px;background:#23863622;border:1px solid var(--ac);text-align:center}
+#done a{color:var(--bl);font-weight:600;word-break:break-all}
+.hint{font-size:12px;color:var(--mut);margin-top:6px}
+.hint a{color:var(--bl)}
+.native .webonly{display:none}
+.seg{display:flex;background:#0d1117;border:1px solid var(--line);border-radius:10px;padding:3px;margin-top:16px}
+.seg button{flex:1;border:0;background:none;color:var(--mut);padding:10px;border-radius:8px;font-size:15px;cursor:pointer}
+.seg button.on{background:#1f6feb33;color:var(--tx);font-weight:600}
+.alt{width:100%;margin-top:10px;padding:12px;border-radius:10px;border:1px solid var(--line);background:#21262d;color:var(--tx);font-size:15px;cursor:pointer}
+.mini{border:1px solid var(--line);background:#21262d;color:var(--tx);border-radius:10px;padding:0 12px;height:48px;font-size:14px;flex:none;cursor:pointer}
+#dev{display:none;margin-top:12px;padding:16px;border:1px solid var(--bl);border-radius:12px;background:#1f6feb14;text-align:center}
+#dev .code{font:700 30px/1.3 ui-monospace,Consolas,monospace;letter-spacing:4px;direction:ltr;margin:8px 0;user-select:all}
+.warn{color:#d29922;font-size:12px;margin-top:6px}
+#hist{margin-top:22px;border-top:1px solid var(--line);padding-top:14px;display:none}
+#hist h2{font-size:15px;margin:0 0 8px;display:flex;justify-content:space-between;align-items:center}
+#hist h2 button{background:none;border:0;color:var(--mut);font-size:12px;cursor:pointer}
+.hi{display:flex;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid #21262d;font-size:13px}
+.hi a{color:var(--bl);direction:ltr;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-decoration:none}
+.hi .m{color:var(--mut);font-size:11px;white-space:nowrap}
+.hi button{background:#21262d;border:1px solid var(--line);color:var(--tx);border-radius:8px;padding:4px 8px;font-size:12px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="card">
+ <h1>⬆️ ZIP إلى GitHub</h1>
+ <p class="sub">كلّ الملفات والمجلدات في التزامٍ واحد، إلى مستودعٍ جديد أو موجود.</p>
+
+ <label class="f" for="tok">التوكن (Personal Access Token)</label>
+ <div class="row">
+  <input id="tok" type="password" placeholder="ghp_... أو github_pat_..." autocomplete="off" spellcheck="false">
+  <button class="eye" id="eye" type="button" aria-label="إظهار">👁</button>
+ </div>
+ <label class="chk"><input type="checkbox" id="rem"> تذكّر التوكن <span id="remHow"></span></label>
+ <div class="hint">صلاحيتا <b>repo</b> و<b>workflow</b> (workflow يلزم إن كان في الـ ZIP مجلد .github). <a href="https://github.com/settings/tokens/new?scopes=repo,workflow&description=zip-to-github" target="_blank" rel="noopener">أنشئ توكن</a></div>
+ <button class="alt" id="login" type="button" hidden>🔑 أو سجّل الدخول عبر GitHub</button>
+ <div id="dev">
+  <div>افتح GitHub واكتب هذا الكود:</div>
+  <div class="code" id="devCode">····-····</div>
+  <button class="btn" id="devOpen" type="button" style="margin-top:6px">نسخ الكود وفتح GitHub</button>
+  <button class="alt" id="devCancel" type="button">إلغاء</button>
+  <div class="hint" id="devSt">بانتظار الموافقة…</div>
+ </div>
+
+ <div class="seg" id="mode">
+  <button type="button" data-m="new" class="on">➕ مستودع جديد</button>
+  <button type="button" data-m="existing">🔄 مستودع موجود</button>
+ </div>
+
+ <div id="newBox">
+ <label class="f" for="name">اسم المشروع الجديد</label>
+ <input id="name" type="text" placeholder="my-project" spellcheck="false" autocapitalize="off">
+
+ <label class="f">الظهور</label>
+ <div class="vis">
+  <label><input type="radio" name="vis" value="private" checked><span>🔒 خاص</span></label>
+  <label><input type="radio" name="vis" value="public"><span>🌍 عام</span></label>
+ </div>
+ </div>
+
+ <div id="exBox" hidden>
+ <label class="f" for="repo">المستودع (owner/name)</label>
+ <div class="row">
+  <input id="repo" type="text" list="repos" placeholder="user/project" spellcheck="false" autocapitalize="off">
+  <button class="mini" id="loadRepos" type="button">مستودعاتي</button>
+ </div>
+ <datalist id="repos"></datalist>
+ <label class="f">طريقة التحديث</label>
+ <div class="vis">
+  <label><input type="radio" name="how" value="merge" checked><span>➕ دمج</span></label>
+  <label><input type="radio" name="how" value="replace"><span>♻️ استبدال كامل</span></label>
+ </div>
+ <div class="hint" id="howHint">يضيف ملفات الـ ZIP ويحدّث المتشابه، ويُبقي باقي ملفات المستودع.</div>
+ </div>
+
+ <label class="f" for="msg">رسالة الالتزام (اختياري)</label>
+ <input id="msg" type="text" placeholder="رفع project.zip" style="direction:rtl;text-align:right">
+
+ <div id="pick"><span class="big">🗂️</span><b>اختر ملف ZIP</b><div class="hint webonly">أو اسحبه هنا</div><div class="hint nativeonly"></div><div id="fn"></div></div>
+ <input id="file" type="file" accept=".zip,application/zip,application/x-zip-compressed,application/octet-stream">
+
+ <button class="btn" id="go">ارفع إلى GitHub</button>
+ <button class="btn cancel" id="stop">إلغاء</button>
+ <div class="bar" id="bar"><i></i></div>
+ <div id="st"></div>
+ <div id="log"></div>
+ <div id="done">✅ تم الرفع<br><a id="link" target="_blank" rel="noopener"></a></div>
+
+ <div id="hist"><h2>🕘 آخر عمليات الرفع <button id="histClear" type="button">مسح</button></h2><div id="histList"></div></div>
+</div>
+
+<script>
+/*@@CORE@@*/
+
+/* ═══ الواجهة ═══ */
+const $=s=>document.querySelector(s);
+const CAP=window.Capacitor, NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform());
+const P=n=>{try{return CAP&&(CAP.Plugins&&CAP.Plugins[n]||CAP.registerPlugin&&CAP.registerPlugin(n))}catch(e){return null}};
+const ZB=NATIVE?P("ZipBridge"):null, APP=NATIVE?P("App"):null, LN=NATIVE?P("LocalNotifications"):null;
+if(NATIVE)document.documentElement.classList.add("native");
+let SRC=null, RUN=null;
+
+const log=(m,c)=>{const L=$("#log");L.style.display="block";const d=document.createElement("div");if(c)d.className=c;d.textContent=m;L.appendChild(d);L.scrollTop=L.scrollHeight};
+const st=(m,c)=>{const e=$("#st");e.textContent=m;e.className=c||""};
+const prog=f=>{$("#bar").style.display="block";$("#bar i").style.width=Math.round(f*100)+"%"};
+const mb=n=>(n/1048576).toFixed(2)+" م.ب";
+
+function setSource(src){
+ SRC=src; $("#fn").textContent=`${src.name} · ${mb(src.size)}`;
+ const n=$("#name"); if(!n.value)n.value=cleanName(src.name.replace(/\.zip$/i,""));
+ if(!/\.zip$/i.test(src.name))st("⚠ الاسم لا ينتهي بـ .zip، سأحاول قراءته كـ ZIP","er"); else st("");
+}
+$("#pick").onclick=()=>$("#file").click();
+$("#file").onchange=e=>{const f=e.target.files[0]; if(f)setSource(fileSource(f))};
+["dragenter","dragover"].forEach(t=>$("#pick").addEventListener(t,e=>{e.preventDefault();$("#pick").classList.add("on")}));
+["dragleave","drop"].forEach(t=>$("#pick").addEventListener(t,e=>{e.preventDefault();$("#pick").classList.remove("on")}));
+$("#pick").addEventListener("drop",e=>{const f=e.dataTransfer.files[0]; if(f)setSource(fileSource(f))});
+$("#eye").onclick=()=>{const t=$("#tok");t.type=t.type==="password"?"text":"password"};
+
+/* ═══ التوكن: Keystore في التطبيق، localStorage في المتصفّح ═══ */
+$("#remHow").textContent=NATIVE?"(مشفّر في Android Keystore)":"(في هذا المتصفّح)";
+async function loadToken(){
+ try{
+  if(ZB){const r=await ZB.getToken(); if(r&&r.token){$("#tok").value=r.token;$("#rem").checked=true}}
+  else{const t=localStorage.getItem("z2g_tok")||sessionStorage.getItem("z2g_tok"); if(t){$("#tok").value=t;$("#rem").checked=!!localStorage.getItem("z2g_tok")}}
+ }catch(e){}
+}
+async function saveToken(t){
+ try{
+  if(ZB){ if($("#rem").checked)await ZB.setToken({token:t}); else await ZB.clearToken() }
+  else{ if($("#rem").checked)localStorage.setItem("z2g_tok",t); else{localStorage.removeItem("z2g_tok");sessionStorage.setItem("z2g_tok",t)} }
+ }catch(e){log("تعذّر حفظ التوكن: "+e.message,"er")}
+}
+$("#rem").onchange=()=>{ if(!$("#rem").checked){ try{ZB?ZB.clearToken():localStorage.removeItem("z2g_tok")}catch(e){} } };
+loadToken();
+
+/* ═══ ملفٌّ من قائمة المشاركة (تيليجرام، واتساب، مدير الملفات…) ═══ */
+async function onShared(info){
+ if(!info||!info.path){ if(info&&info.error)st("❌ تعذّر استلام الملف: "+info.error,"er"); return }
+ if(RUN){log("وصل ملفٌّ جديد أثناء الرفع، تجاهلته","er");return}
+ const url=CAP.convertFileSrc?CAP.convertFileSrc("file://"+info.path):null;
+ setSource(await nativeSource(info,ZB,url));
+ log("📥 استُلم من المشاركة: "+info.name);
+}
+if(ZB){
+ try{ZB.addListener("shared",onShared)}catch(e){}
+ ZB.getPending().then(r=>{if(r&&r.path)onShared(r)}).catch(()=>{});
+ document.querySelector(".nativeonly").textContent="أو شارك ملف ZIP إلى هذا التطبيق من أي مكان";
+}
+
+/* ═══ زرّ الرجوع ═══ */
+if(APP&&APP.addListener)APP.addListener("backButton",()=>{
+ if(typeof DEV!=="undefined"&&DEV){DEV.abort();return}
+ if(RUN){ if(confirm("إلغاء الرفع الجاري؟"))RUN.abort() }
+ else APP.exitApp&&APP.exitApp();
+});
+
+async function notify(title,body){
+ if(!LN)return;
+ try{await LN.schedule({notifications:[{id:Date.now()%2147483647,title,body}]})}catch(e){}
+}
+
+/* ═══ الوضع: جديد / موجود ═══ */
+let MODE="new";
+function setMode(m){
+ MODE=m;
+ document.querySelectorAll("#mode button").forEach(b=>b.classList.toggle("on",b.dataset.m===m));
+ $("#newBox").hidden=m!=="new"; $("#exBox").hidden=m!=="existing";
+ try{localStorage.setItem("z2g_mode",m)}catch(e){}
+}
+document.querySelectorAll("#mode button").forEach(b=>b.onclick=()=>setMode(b.dataset.m));
+setMode(localStorage.getItem("z2g_mode")==="existing"?"existing":"new");
+document.querySelectorAll("input[name=how]").forEach(r=>r.onchange=()=>{
+ $("#howHint").textContent=r.value==="replace"&&r.checked
+  ?"⚠ المستودع يصير مطابقاً للـ ZIP تماماً: أي ملف غير موجود في الـ ZIP يُحذف (يبقى في سجلّ Git)."
+  :"يضيف ملفات الـ ZIP ويحدّث المتشابه، ويُبقي باقي ملفات المستودع.";
+});
+$("#loadRepos").onclick=async()=>{
+ const token=$("#tok").value.trim(); if(!token)return st("أدخل التوكن أولاً","er");
+ $("#loadRepos").disabled=true; st("تحميل مستودعاتك…");
+ try{
+  const L=await listRepos({token});
+  $("#repos").innerHTML="";
+  for(const r of L){const o=document.createElement("option");o.value=r.full;o.label=(r.priv?"🔒 ":"🌍 ")+r.full;$("#repos").appendChild(o)}
+  st(`${L.length} مستودع، ابدأ بكتابة الاسم واختر`,"ok"); $("#repo").focus();
+ }catch(e){st("❌ "+e.message,"er")}
+ finally{$("#loadRepos").disabled=false}
+};
+
+/* ═══ السجلّ ═══ */
+const HK="z2g_hist";
+const hist=()=>{try{return JSON.parse(localStorage.getItem(HK)||"[]")}catch(e){return []}};
+function addHist(r){
+ const h=hist(); h.unshift({full:r.full,url:r.url,files:r.files,mode:r.mode,at:Date.now()});
+ try{localStorage.setItem(HK,JSON.stringify(h.slice(0,30)))}catch(e){}
+ renderHist();
+}
+function renderHist(){
+ const h=hist(), L=$("#histList"); $("#hist").style.display=h.length?"block":"none"; L.innerHTML="";
+ for(const x of h){
+  const d=document.createElement("div"); d.className="hi";
+  const a=document.createElement("a"); a.href=x.url; a.target="_blank"; a.rel="noopener"; a.textContent=x.full;
+  const m=document.createElement("span"); m.className="m";
+  m.textContent=`${x.mode==="existing"?"🔄":"➕"} ${x.files} ملف · ${new Date(x.at).toLocaleDateString("ar",{day:"numeric",month:"short"})}`;
+  const b=document.createElement("button"); b.type="button"; b.textContent="↻ تحديث"; b.title="ارفع إليه مرة أخرى";
+  b.onclick=()=>{setMode("existing"); $("#repo").value=x.full; $("#repo").scrollIntoView({behavior:"smooth",block:"center"})};
+  d.append(a,m,b); L.appendChild(d);
+ }
+}
+$("#histClear").onclick=()=>{ if(confirm("مسح السجلّ؟")){localStorage.removeItem(HK);renderHist()} };
+renderHist();
+
+/* ═══ تسجيل الدخول عبر GitHub (Device Flow، في التطبيق فقط) ═══ */
+const CLIENT_ID="__GITHUB_CLIENT_ID__";
+const HTTP=NATIVE?P("CapacitorHttp"):null;
+const HAS_ID=!!CLIENT_ID&&!/^__/.test(CLIENT_ID);
+if(HTTP&&HAS_ID)$("#login").hidden=false;
+let DEV=null, DEVINFO=null;
+async function nativePost(url,body){
+ const r=await HTTP.request({url,method:"POST",headers:{"Accept":"application/json","Content-Type":"application/json"},data:body});
+ let d=r.data; if(typeof d==="string"){try{d=JSON.parse(d)}catch(e){d={error:d}}}
+ return d;
+}
+$("#login").onclick=async()=>{
+ DEV=new AbortController(); $("#dev").style.display="block"; $("#login").hidden=true;
+ $("#devCode").textContent="····-····"; $("#devSt").textContent="جارٍ طلب الكود…";
+ try{
+  const token=await deviceLogin({clientId:CLIENT_ID,post:nativePost,signal:DEV.signal,
+   onCode:d=>{DEVINFO=d; $("#devCode").textContent=d.user_code; $("#devSt").textContent="بانتظار موافقتك في GitHub…"}});
+  $("#tok").value=token; $("#rem").checked=true; await saveToken(token);
+  st("✅ تم تسجيل الدخول","ok");
+ }catch(e){ if(!/أُلغي/.test(e.message))st("❌ "+e.message,"er") }
+ finally{ DEV=null; $("#dev").style.display="none"; $("#login").hidden=false }
+};
+$("#devOpen").onclick=async()=>{
+ if(!DEVINFO)return;
+ try{await navigator.clipboard.writeText(DEVINFO.user_code); $("#devSt").textContent="نُسخ الكود، الصقه في GitHub"}catch(e){}
+ window.open(DEVINFO.verification_uri,"_blank");
+};
+$("#devCancel").onclick=()=>{ if(DEV)DEV.abort() };
+
+/* ═══ الرفع في الخلفية: خدمةٌ أماميّة بإشعار تقدّم ═══ */
+let lastBg=0;
+const bg={
+ start:async t=>{if(ZB)try{await ZB.bgStart({title:t,text:"بدء…"})}catch(e){log("خدمة الخلفية: "+e.message)}},
+ update:(t,text,pct)=>{ if(!ZB)return; const n=Date.now(); if(n-lastBg<1000&&pct<100)return; lastBg=n;
+  ZB.bgUpdate({title:t,text,pct:Math.round(pct)}).catch(()=>{}) },
+ stop:async()=>{if(ZB)try{await ZB.bgStop()}catch(e){}}
+};
+
+$("#stop").onclick=()=>{ if(RUN)RUN.abort() };
+$("#go").onclick=async()=>{
+ const token=$("#tok").value.trim();
+ if(!token)return st("أدخل التوكن أو سجّل الدخول","er");
+ if(!SRC)return st("اختر ملف ZIP","er");
+ if(!("DecompressionStream" in window))return st("المتصفّح قديم، حدّث Chrome أو Android System WebView","er");
+ const opt={src:SRC,token,mode:MODE,message:$("#msg").value};
+ let label;
+ if(MODE==="new"){
+  const name=cleanName($("#name").value);
+  if(!name)return st("أدخل اسماً صالحاً (حروف إنجليزية وأرقام و - _ .)","er");
+  $("#name").value=name; opt.name=name;
+  opt.priv=document.querySelector("input[name=vis]:checked").value==="private";
+  label=name;
+ }else{
+  opt.repo=$("#repo").value.trim(); if(!opt.repo)return st("اكتب المستودع أو اختره من «مستودعاتي»","er");
+  opt.replace=document.querySelector("input[name=how]:checked").value==="replace";
+  if(opt.replace&&!confirm(`استبدال كامل لمحتوى ${opt.repo}؟\nكل ملف غير موجود في الـ ZIP سيُحذف من الفرع (يبقى في سجلّ Git).`))return;
+  label=opt.repo;
+ }
+ await saveToken(token);
+ RUN=new AbortController(); opt.signal=RUN.signal;
+ $("#go").style.display="none"; $("#stop").style.display="block";
+ $("#done").style.display="none"; $("#log").innerHTML=""; prog(0);
+ if(LN){try{await LN.requestPermissions()}catch(e){}}
+ if(ZB){try{await ZB.keepAwake({on:true})}catch(e){}}
+ const title="⬆️ "+label; await bg.start(title);
+ let P0=0;
+ opt.status=m=>{st(m); bg.update(title,m,P0*100)};
+ opt.progress=f=>{P0=f; prog(f)};
+ opt.log=log;
+ try{
+  const r=await uploadZip(opt);
+  st(`تم: ${r.files} ملف في ${r.sec} ث`,"ok"); log("✓ commit "+r.commit.slice(0,7)+" ← "+r.branch,"ok");
+  $("#link").href=r.url; $("#link").textContent=r.url; $("#done").style.display="block";
+  addHist(r);
+  await bg.stop();
+  notify("✅ تم الرفع",`${r.full} · ${r.files} ملف`);
+  if(ZB)ZB.clearShared().catch(()=>{});
+ }catch(e){
+  await bg.stop();
+  const m=e.message||String(e); st("❌ "+m,"er"); log(m,"er");
+  if(!/أُلغي/.test(m))notify("❌ فشل الرفع",m);
+ }finally{
+  RUN=null; $("#go").style.display="block"; $("#stop").style.display="none";
+  if(ZB){try{await ZB.keepAwake({on:false})}catch(e){}}
+ }
+};
+</script>
+</body>
+</html>
