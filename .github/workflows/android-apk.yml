@@ -29,7 +29,14 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - uses: android-actions/setup-android@v3
+      # Android SDK مثبَّت مسبقاً على ubuntu-latest (ANDROID_HOME)، فلا حاجة لـ setup-android
+      # الذي فشل أثناء قبول التراخيص الإضافية. نكتفي بالترخيص الأساسيّ.
+      - name: Android SDK license
+        continue-on-error: true
+        run: |
+          mkdir -p "$ANDROID_HOME/licenses"
+          printf '\n24333f8a63b6825ea9c5514f83c2829b004d1fee\n8933bad161af4178b1185d1a37fbf41ea5269c55\nd56f5187479451eabf01fb78af6dfcb131a6481e\n' >> "$ANDROID_HOME/licenses/android-sdk-license"
+          ls "$ANDROID_HOME/licenses"
 
       - name: Install
         run: npm install --no-audit --no-fund
